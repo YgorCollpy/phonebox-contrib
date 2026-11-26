@@ -15,6 +15,27 @@ public static class ClaudeHook
     private static readonly string Home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     public static readonly string SettingsPath = Path.Combine(Home, ".claude", "settings.json");
 
+    /// <summary>
+    /// When the user answers a permission prompt in Claude Code's own window, Claude Code does not end the
+    /// PermissionRequest hook: the card stayed on the phone until it expired. PostToolUse, Stop and UserPromptSubmit
+    /// show that Claude Code went on, so these hooks withdraw the card: PostToolUse only the card of the same request,
+    /// the others every card of the session. (Denying in the terminal already ends the hook, which cancels the card.)
+    /// </summary>
+    public const string ContinuedEndpoint = "/api/hooks/claude/continued";
+    internal static readonly string[] ContinuedEvents = ["PostToolUse", "Stop", "UserPromptSubmit"];
+
+    public static int Continued(JsonElement input, ApprovalStore approvals)
+    {
+        if (input.ValueKind != JsonValueKind.Object) return 0;
+        var session = Str(input, "session_id") ?? "";
+        if (session.Length == 0) return 0;
+        if (Str(input, "hook_event_name") != "PostToolUse") return approvals.Withdraw("Claude Code", session);
+        var tool = Str(input, "tool_name") ?? "a tool";
+        var ti = input.TryGetProperty("tool_input", out var t) && t.ValueKind == JsonValueKind.Object ? t : default;
+        // the same title and detail DecideAsync put on the card
+        return approvals.Withdraw("Claude Code", session, ToolTitle(tool), tool == "AskUserQuestion" ? QuestionDetail(ti) : Detail(tool, ti));
+    }
+
     /// <summary>Handles one hook call; returns the JSON for the hook to print, or null for "no decision".</summary>
     public static async Task<object?> HandleAsync(JsonElement input, ConfigStore cfg, ApprovalStore approvals, SessionMonitor sessions, CancellationToken aborted)
         => await HandlePermissionAsync(input, cfg, approvals, sessions, aborted, "Claude Code", "claude:", allowQuestions: true);
@@ -170,6 +191,35 @@ public static class ClaudeHook
     private static string HookCommand(int port, string endpoint) =>
         $"{(OperatingSystem.IsWindows() ? "curl.exe" : "curl")} -s --noproxy 127.0.0.1 --max-time 3600 -X POST http://127.0.0.1:{port}{endpoint} -H \"Content-Type: application/json\" --data-binary \"@-\"";
 
+    // One event that withdraws a card: short (the agent answers at once) and never blocking Claude Code
+    private static void ConfigureContinued(JsonObject hooks, string ev, bool install, int port)
+    {
+        if (hooks[ev] is { } node && node is not JsonArray)
+            throw new InvalidDataException($"\"hooks.{ev}\" in settings.json is not a list");
+        var groups = hooks[ev] as JsonArray ?? new JsonArray();
+        foreach (var g in groups.ToList())
+        {
+            if (g is not JsonObject go || go["hooks"] is not JsonArray hs) continue;
+            foreach (var h in hs.Where(h => IsOurs(h, ContinuedEndpoint)).ToList()) hs.Remove(h);
+            if (hs.Count == 0) groups.Remove(g);
+        }
+        if (install)
+        {
+            var hook = new JsonObject
+            {
+                ["type"] = "command",
+                ["command"] = HookCommand(port, ContinuedEndpoint).Replace("--max-time 3600", "--max-time 3"),
+                ["timeout"] = 10,
+            };
+            // Stop and UserPromptSubmit take no matcher
+            groups.Add(ev == "PostToolUse"
+                ? new JsonObject { ["matcher"] = "*", ["hooks"] = new JsonArray(hook) }
+                : new JsonObject { ["hooks"] = new JsonArray(hook) });
+        }
+        if (groups.Count > 0) { if (!ReferenceEquals(hooks[ev], groups)) hooks[ev] = groups; }
+        else hooks.Remove(ev);
+    }
+
     internal static bool IsOurs(JsonNode? hook, string endpoint)
     {
         if (hook is not JsonObject obj || obj["command"] is not JsonValue v || !v.TryGetValue<string>(out var cmd))
@@ -288,6 +338,9 @@ public static class ClaudeHook
                 if (!ReferenceEquals(hooks["PermissionRequest"], groups)) hooks["PermissionRequest"] = groups;
             }
             else hooks.Remove("PermissionRequest");
+            // only Claude Code's own hook gets the events that withdraw a card answered on the computer
+            if (endpoint == Endpoint)
+                foreach (var ev in ContinuedEvents) ConfigureContinued(hooks, ev, install, port);
             if (hooks.Count > 0)
             {
                 if (!ReferenceEquals(root["hooks"], hooks)) root["hooks"] = hooks;

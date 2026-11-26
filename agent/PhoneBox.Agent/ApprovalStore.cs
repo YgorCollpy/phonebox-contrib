@@ -136,5 +136,26 @@ public sealed class ApprovalStore(PushStore events, ILogger<ApprovalStore> log)
         return true;
     }
 
+    /// <summary>
+    /// The coding agent went on without the phone (the user answered in its own window), so its cards leave the phone
+    /// now instead of at their expiry. With a tool and detail, only the card for that request; without, every card of
+    /// the session. Returns how many cards were withdrawn.
+    /// </summary>
+    public int Withdraw(string source, string session, string? tool = null, string? detail = null)
+    {
+        var n = 0;
+        foreach (var p in _pending.Values)
+        {
+            var a = p.Approval;
+            if (a.Source != source || a.Session != session) continue;
+            if (tool is not null && (a.Tool != tool || a.Detail != detail)) continue;
+            // AskAsync wakes with no decision, drops the pending entry and tells the phone (approval-done)
+            if (!p.Decision.TrySetResult(null)) continue;
+            n++;
+            log.LogInformation("approval {Id}: answered on the computer, removed from the phone", a.Id);
+        }
+        return n;
+    }
+
     public static string NewId() => Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(6)).ToLowerInvariant();
 }

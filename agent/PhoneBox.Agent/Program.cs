@@ -974,6 +974,17 @@ app.MapPost(ClaudeHook.Endpoint, async (HttpRequest req, ConfigStore cfg, Approv
     var output = await ClaudeHook.HandleAsync(input, cfg, approvals, sessions, req.HttpContext.RequestAborted);
     return output is null ? Results.Text("") : Results.Json(output);
 });
+// Claude Code went on without the phone (answered in its own window): withdraw that card (local only)
+app.MapPost(ClaudeHook.ContinuedEndpoint, async (HttpRequest req, ApprovalStore approvals) =>
+{
+    try
+    {
+        using var doc = await JsonDocument.ParseAsync(req.Body, cancellationToken: req.HttpContext.RequestAborted);
+        ClaudeHook.Continued(doc.RootElement, approvals);
+    }
+    catch (JsonException) { }
+    return Results.Text("");
+});
 app.MapGet("/api/claude/hook", (ConfigStore cfg) =>
 {
     // full paths are fine here: this endpoint answers the settings page on this computer only

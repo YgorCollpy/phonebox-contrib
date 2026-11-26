@@ -404,7 +404,9 @@ When Claude Code asks for permission (run a command, edit a file, use an MCP too
 project, tool and the command or file — with **Allow** and **Deny**. Turn it on in **Settings › General › Claude Code
 permission prompts** and press *Install hook*: PhoneBox adds a `PermissionRequest` hook to `~/.claude/settings.json`
 (and keeps a backup next to it as `settings.json.phonebox.bak`). If the phone is not connected or nobody answers in
-time, the hook returns no decision and Claude Code asks in the terminal as usual. Optionally only when you have been
+time, the hook returns no decision and Claude Code asks in the terminal as usual. Answering in Claude Code's own
+window removes the card from the phone too: *Install hook* also adds short `PostToolUse`, `Stop` and
+`UserPromptSubmit` hooks that tell PhoneBox Claude Code went on, and *Remove hook* takes them out again. Optionally only when you have been
 away from the keyboard for a minute. Each hook (Claude Code, Codex and Cursor) keeps the seconds to answer it was
 installed with. A shorter time applies to the phone card at once; for a longer one, remove the hook and install it
 again, or the hook gives up before the phone does. To have a reinstalled Cursor hook cover WSL as well, turn on **Also
