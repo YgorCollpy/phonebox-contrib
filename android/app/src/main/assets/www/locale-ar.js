@@ -1787,6 +1787,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "عرض إشعار",
       "show the page": "أظهر الصفحة",
       "the CPU is busy": "يرتفع استخدام المعالج (CPU)",
+      "the CPU temperature is above": "تتجاوز حرارة المعالج (CPU)",
+      "the phone battery temperature is above": "تتجاوز حرارة بطارية الهاتف",
       "the camera is in use": "الكاميرا مستخدمة",
       "the microphone is in use": "الميكروفون قيد الاستخدام",
       "the network is slow": "الشبكة بطيئة",

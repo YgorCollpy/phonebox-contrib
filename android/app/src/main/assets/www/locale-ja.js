@@ -1753,6 +1753,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "表示する",
       "show the page": "ページを表示",
       "the CPU is busy": "あの CPU 忙しいんだ",
+      "the CPU temperature is above": "CPU の温度が次を超えた",
+      "the phone battery temperature is above": "スマホのバッテリー温度が次を超えた",
       "the camera is in use": "カメラが使われている",
       "the microphone is in use": "マイクが使われている",
       "the network is slow": "ネットワークが遅い",

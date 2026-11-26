@@ -1753,6 +1753,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "tunjukkan notifikasi",
       "show the page": "Tampilkan halaman",
       "the CPU is busy": "CPU sedang sibuk",
+      "the CPU temperature is above": "suhu CPU melebihi",
+      "the phone battery temperature is above": "suhu baterai ponsel melebihi",
       "the camera is in use": "kamera sedang digunakan",
       "the microphone is in use": "mikrofon sedang digunakan",
       "the network is slow": "jaringan lambat",

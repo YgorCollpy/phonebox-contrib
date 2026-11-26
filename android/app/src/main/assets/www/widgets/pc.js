@@ -1839,7 +1839,7 @@ W.volume = {
 
 // The agent's automation rules: which hold right now, and a button to pause them all for an hour.
 const RULE_WHEN = { 'session-waiting': '✳️', 'session-busy': '⚙️', 'media-playing': '🎵', 'process-running': '🪟', 'mic-in-use': '🎙️', 'camera-in-use': '📷',
-  'obs-live': '🔴', 'calendar-event': '📆', 'cpu-above': '🔥', idle: '🌙', time: '🕙', push: '📡', 'quota-above': '🎯', 'review-requested': '👀',
+  'obs-live': '🔴', 'calendar-event': '📆', 'cpu-above': '🔥', 'cpu-temp-above': '🌡️', 'phone-battery-temp-above': '🌡️', idle: '🌙', time: '🕙', push: '📡', 'quota-above': '🎯', 'review-requested': '👀',
   'ci-failed': '❌', 'battery-low': '🔋', 'ping-high': '📶', always: '📅' };
 W.rules = {
   needs: ['state'],

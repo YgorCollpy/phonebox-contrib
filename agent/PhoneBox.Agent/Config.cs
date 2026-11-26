@@ -574,7 +574,7 @@ public sealed class RuleConfig
     public string? Arg { get; set; }
 
     public static readonly string[] Triggers = ["session-waiting", "session-busy", "media-playing", "process-running", "app-in-front", "mic-in-use", "camera-in-use", "obs-live", "calendar-event",
-        "cpu-above", "idle", "time", "push", "quota-above", "review-requested", "ci-failed", "battery-low", "ping-high", "always"];
+        "cpu-above", "cpu-temp-above", "phone-battery-temp-above", "idle", "time", "push", "quota-above", "review-requested", "ci-failed", "battery-low", "ping-high", "always"];
     public static readonly string[] Actions = ["goto", "notify", "push", "shortcut", "night"];
 }
 

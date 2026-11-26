@@ -1134,6 +1134,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "bildirim göster",
       "show the page": "Sayfayı göster",
       "the CPU is busy": "CPU meşgul.",
+      "the CPU temperature is above": "CPU sıcaklığı şunu aşarsa",
+      "the phone battery temperature is above": "telefon pili sıcaklığı şunu aşarsa",
       "the camera is in use": "Kamera kullanılıyor",
       "the microphone is in use": "mikrofon kullanılıyor",
       "the network is slow": "ağ yavaş",

@@ -1753,6 +1753,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "показати сповіщення",
       "show the page": "показати сторінку",
       "the CPU is busy": "цей CPU є зайнятим",
+      "the CPU temperature is above": "температура CPU перевищує",
+      "the phone battery temperature is above": "температура батареї телефона перевищує",
       "the camera is in use": "фотоапарат використовується",
       "the microphone is in use": "мікрофон використовується",
       "the network is slow": "мережа повільна",

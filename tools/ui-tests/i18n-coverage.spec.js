@@ -200,7 +200,8 @@ test('settings.html keeps no English literal in a position that reaches the scre
   const LOOKED_UP_BY_TEXT = new Set([
     'an AI session needs me', 'an AI session is working', 'music or video plays', 'an app is running',
     'an app is in front', 'the microphone is in use', 'the camera is in use', 'a calendar event is on',
-    'OBS is recording or streaming', 'the CPU is busy', 'I am away from the PC', 'it is between',
+    'OBS is recording or streaming', 'the CPU is busy', 'the CPU temperature is above',
+    'the phone battery temperature is above', 'I am away from the PC', 'it is between',
     'a pushed value', 'an AI quota is above', 'a GitHub review is requested', 'CI fails on my pull request',
     'a device battery is below', 'the network is slow', 'always (use the days and hours below)',
     'show the page', 'show a notification', 'push a value', 'run a shortcut',

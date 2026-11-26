@@ -1753,6 +1753,8 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "show a notification": "알림 보이기",
       "show the page": "페이지 보기",
       "the CPU is busy": "로그인 CPU 바쁘다",
+      "the CPU temperature is above": "CPU 온도가 다음을 초과함",
+      "the phone battery temperature is above": "휴대폰 배터리 온도가 다음을 초과함",
       "the camera is in use": "카메라가 사용 중입니다",
       "the microphone is in use": "마이크가 사용 중입니다",
       "the network is slow": "네트워크가 느리다",
