@@ -95,7 +95,7 @@ public sealed class RuleEngine(ConfigStore config, PushStore push, SessionMonito
             if (holds) { st.FalseSince = 0; if (st.TrueSince == 0) st.TrueSince = now; }
             else { st.TrueSince = 0; if (st.FalseSince == 0) st.FalseSince = now; }
 
-            var sustainSec = rule.ForSec > 0 ? rule.ForSec : rule.When == "cpu-above" ? CpuSustainSec : 0;
+            var sustainSec = SustainSec(rule);
             var sustained = holds && now - st.TrueSince >= sustainSec * 1000L;
             var cooled = !_fired.TryGetValue(rule.Id, out var last) || now - last >= rule.CooldownMin * 60_000L;
 
@@ -194,6 +194,13 @@ public sealed class RuleEngine(ConfigStore config, PushStore push, SessionMonito
                 log.LogWarning("rule {Id}: could not switch {Shortcut} back off: {Error}", r.Id, sc.Id, error);
         }
     }
+
+    /// <summary>
+    /// How long the condition must hold before the rule acts: the rule's own seconds, or for the CPU's load and
+    /// temperature 15 s, so a CPU hovering around the limit or a one-second boost spike does not fire, end and fire again.
+    /// </summary>
+    internal static int SustainSec(RuleConfig rule) =>
+        rule.ForSec > 0 ? rule.ForSec : rule.When is "cpu-above" or "cpu-temp-above" ? CpuSustainSec : 0;
 
     /// <summary>The CPU temperature (from the hardware sensors) at or above the limit, 85 °C by default.</summary>
     internal static (bool Holds, string Detail) CpuTempAbove(double? temp, double? limit) =>

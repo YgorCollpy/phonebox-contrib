@@ -537,7 +537,7 @@ public sealed class RuleConfig
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public bool Enabled { get; set; } = true;
-    /// <summary>session-waiting, session-busy, media-playing, process-running, app-in-front, mic-in-use, camera-in-use, obs-live, calendar-event, cpu-above, idle, time, push.</summary>
+    /// <summary>session-waiting, session-busy, media-playing, process-running, app-in-front, mic-in-use, camera-in-use, obs-live, calendar-event, cpu-above, cpu-temp-above, phone-battery-temp-above, idle, time, push.</summary>
     public string When { get; set; } = "session-waiting";
     /// <summary>App / process names ("zoom|Teams"), a time window ("22:00-07:00") or a push key, depending on <see cref="When"/>.</summary>
     public string? Match { get; set; }

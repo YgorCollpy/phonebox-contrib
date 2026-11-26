@@ -36,6 +36,14 @@ public class TemperatureRuleTests
         Assert.False(RuleEngine.PhoneBatteryTempAbove(null, null, Now).Holds);
     }
 
+    [Theory]
+    [InlineData("cpu-temp-above", 0, 15)]  // like cpu-above: a spike or a CPU hovering at the limit doesn't flap
+    [InlineData("cpu-above", 0, 15)]
+    [InlineData("cpu-temp-above", 60, 60)] // the rule's own seconds win
+    [InlineData("phone-battery-temp-above", 0, 0)] // the phone reports every 30 s: no spikes to wait out
+    public void TheCpuTemperatureWaitsLikeTheCpuLoad(string when, int forSec, int expected) =>
+        Assert.Equal(expected, RuleEngine.SustainSec(new RuleConfig { When = when, ForSec = forSec }));
+
     [Fact]
     public void BothTriggersAreKnownRuleConditions()
     {

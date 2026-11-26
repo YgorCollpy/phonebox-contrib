@@ -1087,6 +1087,7 @@ window.PhoneBoxLocaleData = Object.assign(window.PhoneBoxLocaleData || {}, {
       "Tu": "ثلا",
       "Mo": "اثن",
       "% (for 15 s)": "% (لمدة 15 ثانية)",
+      "°C (for 15 s)": "°C (لمدة 15 ثانية)",
       "No report from the phone yet": "لم يصل تقرير من الهاتف بعد",
       "Invalid settings JSON.": "صيغة JSON غير صالحة.",
       "Settings JSON must be an object.": "يجب أن تكون إعدادات JSON كائنًا.",

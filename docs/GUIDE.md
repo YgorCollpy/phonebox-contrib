@@ -522,6 +522,8 @@ To show whether a GitHub Copilot CLI session is working or waiting for you (also
 | a calendar event is on (optionally by title) | |
 | OBS is recording or streaming | |
 | the CPU stays above a percentage for 15 s | |
+| the CPU temperature stays at or above a limit (85 °C by default) for 15 s, read from the hardware sensors; no reading, no trigger | |
+| the phone's battery temperature is at or above a limit (40 °C by default), from the battery report the Android app sends every 30 s; a report older than 3 minutes no longer counts. The iOS app sends no battery report, so this never fires for an iOS panel | |
 | you have been away from the keyboard for N minutes | |
 | it is between two times (`22:00-07:00`) | |
 | a pushed value is on, or above / at least / below / at most / equal to a value (a webhook from Home Assistant, a doorbell…) | run a shortcut |
