@@ -92,4 +92,64 @@ public sealed class ApprovalAnsweredOnComputerTests : IDisposable
         Assert.Null(hooks["UserPromptSubmit"]);
         Assert.Equal("my-own-stop-hook", (string?)hooks["Stop"]![0]!["hooks"]![0]!["command"]);
     }
+
+    [Fact]
+    public async Task AWithdrawnCardCanNoLongerBeAllowed()
+    {
+        var card = Ask("a", "s1", "Run a command", "rm notes.txt", CancellationToken.None);
+        Assert.Equal(1, _store.Withdraw("Claude Code", "s1"));
+
+        Assert.False(_store.Decide("a", "allow")); // a late tap on the phone loses the race
+        Assert.Null(await card.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.Empty(_store.Snapshot());
+    }
+
+    [Fact]
+    public void AnInstallFromBeforeTheContinuedHooksIsOfferedAgainAndInstallUpgradesIt()
+    {
+        var path = Path.Combine(_dir, "settings.json");
+        Assert.Null(ClaudeHook.Configure(true, 18765, 30, path));
+        Assert.True(ClaudeHook.Installed(path));
+
+        // the file as an older PhoneBox left it: only the PermissionRequest hook
+        var root = JsonNode.Parse(File.ReadAllText(path))!.AsObject();
+        foreach (var ev in ClaudeHook.ContinuedEvents) root["hooks"]!.AsObject().Remove(ev);
+        File.WriteAllText(path, root.ToJsonString());
+        Assert.False(ClaudeHook.Installed(path)); // the settings show "Install hook" again
+
+        Assert.Null(ClaudeHook.Configure(true, 18765, 30, path));
+        Assert.True(ClaudeHook.Installed(path));
+        var hooks = JsonNode.Parse(File.ReadAllText(path))!["hooks"]!.AsObject();
+        Assert.Single(hooks["PermissionRequest"]!.AsArray()); // replaced, not added twice
+    }
+
+    [Fact]
+    public void TheContinuedHooksNeverFailWhenPhoneBoxIsClosed()
+    {
+        var path = Path.Combine(_dir, "settings.json");
+        Assert.Null(ClaudeHook.Configure(true, 18765, 30, path));
+        var hooks = JsonNode.Parse(File.ReadAllText(path))!["hooks"]!.AsObject();
+        foreach (var ev in ClaudeHook.ContinuedEvents)
+            Assert.EndsWith(" || exit 0", (string?)hooks[ev]![0]!["hooks"]![0]!["command"]);
+        // the permission hook itself is unchanged: its exit code is how Claude Code falls back to the terminal
+        Assert.DoesNotContain("exit 0", (string?)hooks["PermissionRequest"]![0]!["hooks"]![0]!["command"]);
+    }
+
+    [Fact]
+    public void AUsersMalformedEventIsKeptAndDoesNotBlockInstallOrRemove()
+    {
+        var path = Path.Combine(_dir, "settings.json");
+        File.WriteAllText(path, """{"hooks":{"Stop":"not a list"}}""");
+
+        Assert.Null(ClaudeHook.Configure(true, 18765, 30, path));
+        var hooks = JsonNode.Parse(File.ReadAllText(path))!["hooks"]!.AsObject();
+        Assert.Equal("not a list", (string?)hooks["Stop"]);
+        Assert.NotNull(hooks["PostToolUse"]);
+        Assert.True(ClaudeHook.Installed(path));
+
+        Assert.Null(ClaudeHook.Configure(false, 18765, 30, path));
+        hooks = JsonNode.Parse(File.ReadAllText(path))!["hooks"]!.AsObject();
+        Assert.Equal("not a list", (string?)hooks["Stop"]);
+        Assert.Null(hooks["PermissionRequest"]);
+    }
 }
